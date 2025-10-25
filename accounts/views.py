@@ -7,6 +7,9 @@ from authn.jwt import verify_jwt_verbose
 from authn.jwt import make_jwt
 from .serializers import RegisterSerializer, LoginSerializer, UserMeSerializer
 from authn.services import issue_refresh_token, get_refresh_row, rotate_refresh, revoke_refresh
+import logging
+log = logging.getLogger("accounts.views")
+
 User = get_user_model()
 
 
@@ -29,9 +32,10 @@ class LoginView(APIView):
     def post(self, request):
         s = LoginSerializer(data=request.data)
         if not s.is_valid():
+            log.info("login.invalid email=%s errs=%s", request.data.get("email"), s.errors)
             return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
         user = s.validated_data["user"]
-
+        log.info("login.ok user_id=%s email=%s", user.id, user.email)
         access = make_jwt(user.id) 
         refresh_raw, _ = issue_refresh_token(user, request=request)
 
@@ -118,6 +122,7 @@ class RefreshView(APIView):
     def post(self, request):
         refresh_raw = str(request.data.get("refresh") or "").strip()
         if not refresh_raw:
+            log.info("refresh.missing_token")
             return Response({"detail": "refresh token required"}, status=status.HTTP_400_BAD_REQUEST)
 
         rt = get_refresh_row(refresh_raw)
@@ -126,6 +131,7 @@ class RefreshView(APIView):
         if not rt.is_active:
             return Response({"detail": "refresh token expired or revoked"}, status=status.HTTP_401_UNAUTHORIZED)
 
+        log.info("refresh.ok user_id=%s family=%s", rt.user_id, rt.family)
         # Rotate refresh token
         new_refresh_raw, _ = rotate_refresh(rt, request=request)
 

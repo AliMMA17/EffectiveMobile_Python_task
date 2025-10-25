@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from accesscontrol.services import has_permission
-
+import logging
+log = logging.getLogger("mockbiz.views")
 # Ephemeral in-memory items (id, owner_id, name)
 _items: List[Dict] = []
 _id_gen = count(1)
@@ -38,6 +39,7 @@ class ItemsView(APIView):
     def get(self, request):
         user = _get_user_from_request(request)
         if not (user and getattr(user, "is_authenticated", False)):
+            log.info("items.get.unauth")
             return Response({"detail": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
 
         allowed_all = has_permission(user, "items", "read", None)
@@ -45,6 +47,7 @@ class ItemsView(APIView):
             # maybe allowed only for own items?
             allowed_own = has_permission(user, "items", "read", owner_id=user.id)
             if not allowed_own:
+                log.info("items.get.forbidden user_id=%s", user.id)
                 return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)
             _ensure_seed_for_user(user.id)
             mine = [it for it in _items if it["owner_id"] == user.id]
@@ -59,6 +62,7 @@ class ItemsView(APIView):
     def post(self, request):
         user = _get_user_from_request(request)
         if not (user and getattr(user, "is_authenticated", False)):
+            log.info("items.post.unauth")
             return Response({"detail": "Unauthorized"}, status=status.HTTP_401_UNAUTHORIZED)
         if not has_permission(user, "items", "create", owner_id=user.id):
             return Response({"detail": "Forbidden"}, status=status.HTTP_403_FORBIDDEN)

@@ -7,12 +7,14 @@ import jwt
 JWT_SECRET = os.getenv("JWT_SECRET", "dev")
 JWT_ALG = os.getenv("JWT_ALG", "HS256")
 JWT_EXPIRES_MIN = int(os.getenv("JWT_EXPIRES_MIN", "60"))
-
+import logging
+log = logging.getLogger("authn.jwt")
 def make_jwt(user_id: int) -> str:
     now = dt.datetime.utcnow()
     exp = now + dt.timedelta(minutes=JWT_EXPIRES_MIN)
     payload = {"sub": str(user_id), "iat": int(now.timestamp()), "exp": int(exp.timestamp())}
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALG)
+    log.debug("jwt.issue sub=%s", user_id)
     return token if isinstance(token, str) else token.decode("utf-8")
 
 def verify_jwt(token: str) -> Optional[dict]:
@@ -23,7 +25,7 @@ def verify_jwt(token: str) -> Optional[dict]:
     except jwt.InvalidTokenError:
         return None
 
-# New: verbose checker to show the exact error/payload
+# verbose checker to show the exact error/payload
 def verify_jwt_verbose(token: str) -> Dict[str, Any]:
     out: Dict[str, Any] = {"ok": False, "alg": JWT_ALG}
     try:

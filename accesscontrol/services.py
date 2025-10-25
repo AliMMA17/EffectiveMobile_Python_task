@@ -3,12 +3,14 @@ from typing import Optional
 from django.db.models import Q
 from django.contrib.auth import get_user_model
 from .models import AccessRule
-
+import logging
+log = logging.getLogger("accesscontrol.services")
 User = get_user_model()
 
 # action in {"read","create","update","delete"}
 def has_permission(user: Optional[User], element_slug: str, action: str, owner_id: Optional[int] = None) -> bool:
     if not user or not getattr(user, "is_active", False):
+        log.debug("perm.deny unauth element=%s action=%s", element_slug, action)
         return False
     if getattr(user, "is_superuser", False):
         return True
