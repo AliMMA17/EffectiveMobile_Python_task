@@ -5,11 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: auth_demo_api
-    env_file:
-      - .env
-    command: ./entrypoint.sh
     ports:
       - "8000:8000"
+    env_file:
+      - .env
     volumes:
-      - .:/app:delegated 
+      - .:/app:delegated
+    command: bash -lc "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"

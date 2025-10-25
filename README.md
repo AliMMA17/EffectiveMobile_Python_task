@@ -2,7 +2,7 @@
 
 A minimal backend with **custom JWT authentication** and a **role-based access control (RBAC)** system that distinguishes **own** vs **all** access per business element.
 
-## API Docs for some endpoints (Postman)
+## API Docs for some endpoints (Postman, just to show I'm familiar with it)
 
 **Docs:** https://documenter.getpostman.com/view/37281446/2sB3WjzjEp  
 
@@ -17,7 +17,7 @@ A minimal backend with **custom JWT authentication** and a **role-based access c
 - **Admin RBAC API**: `/api/rbac/roles/`, `/api/rbac/elements/`, `/api/rbac/rules/` (CRUD by admins).
 - **Mock business endpoints**: `/api/mock/items/` with full 401/403 behavior using RBAC rules.
 
-## Run
+## Local Run
 
 ```bash
 # 1) Create a virtualenv (recommended)
@@ -31,9 +31,16 @@ python manage.py createsuperuser --email admin@example.com
 # 5) Run
 python manage.py runserver
 ```
+## Docker Run
 
+```bash
+docker compose up --build
 
-## Endpoints
+#create superuser
+docker compose exec api python manage.py createsuperuser
+```
+
+## Some of the Endpoints
 
 ### Auth
 - **POST** `/api/auth/register/`  
