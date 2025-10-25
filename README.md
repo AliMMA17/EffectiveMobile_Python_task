@@ -28,7 +28,10 @@ pip install -r requirements.txt
 python manage.py migrate
 # 4) (Optional) Create superuser for admin
 python manage.py createsuperuser --email admin@example.com
-# 5) Run
+# 5) added the seeds
+python manage.py seed_demo --with-users --with-items --admin-email admin@example.com --admin-password 'YOUR PASSWORD'
+
+# 6) Run
 python manage.py runserver
 ```
 ## Docker Run
