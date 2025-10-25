@@ -17,6 +17,61 @@ A minimal backend with **custom JWT authentication** and a **role-based access c
 - **Admin RBAC API**: `/api/rbac/roles/`, `/api/rbac/elements/`, `/api/rbac/rules/` (CRUD by admins).
 - **Mock business endpoints**: `/api/mock/items/` with full 401/403 behavior using RBAC rules.
 
+
+## Project Structure
+
+├─ core/
+│ ├─ init.py
+│ ├─ settings.py # ENV-based DB toggle (SQLite/Postgres), DRF, LOGGING
+│ ├─ urls.py # mounts /api/auth, /api/rbac, /api/mock, /admin
+│ ├─ logging_context.py # request-scoped logging context (rid/uid/path/method)
+│ └─ middleware.py # RequestContextMiddleware (sets request_id etc.)
+│
+├─ accounts/
+│ ├─ init.py
+│ ├─ models.py # Custom User model (email auth), M2M to Role
+│ ├─ serializers.py # Register/Login/UserMe serializers
+│ ├─ views.py # Register, Login, Refresh, Logout, Me
+│ ├─ urls.py # /api/auth/*
+│ └─ migrations/
+│ └─ 0001_initial.py
+│
+├─ authn/
+│ ├─ init.py
+│ ├─ jwt.py # make_jwt / verify_jwt
+│ ├─ middleware.py # JWTAuthMiddleware (sets request.user from Bearer)
+│ ├─ drf_auth.py # DRF Authentication class (sets request.user)
+│ ├─ models.py # RefreshToken (server-stored, rotation)
+│ ├─ services.py # issue/rotate/revoke refresh tokens
+│ └─ admin.py # (optional) RefreshToken admin
+│
+├─ accesscontrol/
+│ ├─ init.py
+│ ├─ models.py # Role, BusinessElement, AccessRule (own vs all)
+│ ├─ services.py # has_permission(user, element, action, owner_id)
+│ ├─ permissions.py # IsAdminRole (superuser or role 'admin')
+│ ├─ views.py # Admin RBAC viewsets
+│ ├─ urls.py # /api/rbac/*
+│ ├─ migrations/
+│ │ └─ 0001_initial.py
+│ └─ management/
+│ └─ commands/
+│ └─ seed_demo.py # Idempotent seeder (roles/elements/rules/users/items)
+│
+├─ mockbiz/
+│ ├─ init.py
+│ └─ views.py # /api/mock/items/ (in-memory items; RBAC enforced)
+│
+├─ manage.py
+├─ requirements.txt
+├─ README.md
+├─ .env # local env (JWT_SECRET, USE_SQLITE, LOG_LEVEL, etc.)
+├─ .gitignore # ignores .venv/, db.sqlite3, pycache/, etc.
+│
+├─ docker-compose.yml # (optional) Docker dev; API (and optionally DB)
+├─ docker-compose.pg.yml # (optional) Add Postgres when needed
+├─ Dockerfile # Python image + deps
+
 ## Local Run
 
 ```bash
