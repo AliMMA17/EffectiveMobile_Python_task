@@ -31,9 +31,15 @@ class LoginView(APIView):
         if not s.is_valid():
             return Response(s.errors, status=status.HTTP_400_BAD_REQUEST)
         user = s.validated_data["user"]
-        token = make_jwt(user.id)
-        # Stateless: client stores token (e.g., Authorization header).
-        return Response({"token": token, "user": UserMeSerializer(user).data})
+
+        access = make_jwt(user.id) 
+        refresh_raw, _ = issue_refresh_token(user, request=request)
+
+        return Response({
+            "token": access,
+            "refresh": refresh_raw,
+            "user": UserMeSerializer(user).data
+        })
 
 
 class LogoutView(APIView):

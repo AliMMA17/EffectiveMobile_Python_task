@@ -2,6 +2,10 @@
 
 A minimal backend with **custom JWT authentication** and a **role-based access control (RBAC)** system that distinguishes **own** vs **all** access per business element.
 
+## API Docs for some endpoints (Postman)
+
+**Docs:** https://documenter.getpostman.com/view/37281446/2sB3WjzjEp  
+
 ## Features
 
 - **Auth (JWT)**: register, login, logout, update profile, soft delete account.
