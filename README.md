@@ -19,7 +19,7 @@ A minimal backend with **custom JWT authentication** and a **role-based access c
 
 
 ## Project Structure
-
+```text
 ├─ core/
 │ ├─ init.py
 │ ├─ settings.py # ENV-based DB toggle (SQLite/Postgres), DRF, LOGGING
@@ -71,7 +71,7 @@ A minimal backend with **custom JWT authentication** and a **role-based access c
 ├─ docker-compose.yml # (optional) Docker dev; API (and optionally DB)
 ├─ docker-compose.pg.yml # (optional) Add Postgres when needed
 ├─ Dockerfile # Python image + deps
-
+```
 ## Local Run
 
 ```bash
