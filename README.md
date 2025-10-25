@@ -26,7 +26,7 @@ python manage.py migrate
 python manage.py createsuperuser --email admin@example.com
 # 5) Run
 python manage.py runserver
-
+```
 
 
 ## Endpoints
